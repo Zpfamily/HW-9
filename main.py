@@ -1,7 +1,9 @@
+phonebook = {}
+
 def error_handler(func):
-    def inner():
+    def inner(*args, **kwargs):
         try:
-            result = func()
+            result = func(*args, **kwargs)
             return result
         except KeyError:
             print('No user with this name')
@@ -11,79 +13,65 @@ def error_handler(func):
             print('Enter user name')
     return inner
 
-dict = {}
-
 @error_handler
-def hello():
+def hello(command, name, number):
     print("How can I help you?\n")
-    
+
 @error_handler    
-def add():
-    name = start[1]
-    value = start[2]
-    if start[1] in dict:
-        print("This name is exist. Try another!")
+def add(command, name, number):
+    if name in phonebook:
+        print("This name already exists. Try another!")
     else:
-        dict[name] = value
-        print(f"You added name: {name} and phonenumber: {value} to your phonebook") 
-      
-    
+        phonebook[name] = number
+        print(f"You added name: {name} and phone number: {number} to your phonebook") 
 
 @error_handler     
-def change():
-    
-    if start[1] in dict:
-        dict[start[1]] = start[2]
-        print(f"You change your phonenumber to {start[2]}")
+def change(command, name, number):
+    if name in phonebook:
+        phonebook[name] = number
+        print(f"You changed your phone number to {number}")
     else:
         raise KeyError
-     
-    
-    
+
 @error_handler 
-def phone():
-    print(f'Phonenumber: {dict[start[1]]}')
-        
+def phone(command, name, number):
+    return phonebook[name]
+
 @error_handler              
 def show_all():
-    print(f'Phonebook:\n {dict}')
- 
-  
+    return phonebook
+
 def exit():
-    print("Good bye!")
+    return "Good bye!"
 
-    
+def main():
+    while True:
+        start = input('').split()
+        command = start[0].upper()
+        name = start[1] if len(start) > 1 else None
+        number = start[2] if len(start) > 2 else None
 
-while True:
+        if command.startswith('HELLO'):
+            hello(command, name, number)
 
-    start = input('').split()
-   
-        
-    if start[0].upper().startswith('HELLO'):
-        hello()
-        
-    elif start[0].upper().startswith("ADD"):
-        add()
-       
-    elif start[0].upper().startswith("CHANGE"):
-        change()
-    
-    elif start[0].upper().startswith("PHONE"):
-        phone()
-        
-    elif len(start) > 1 and start[0].upper().startswith("SHOW") and start[1].upper().startswith("ALL"):
-        show_all()
-     
-    elif len(start) > 1 and start[0].upper().startswith("GOOD") and start[1].upper().startswith("BYE") or start[0].upper().startswith("CLOSE") or start[0].upper().startswith("EXIT"):
-        exit()
-        break   
- 
-    else:
-        print("No commands in list. Try: add/change/phone/show all/good bye/close/exit")
-       
-    
+        elif command.startswith("ADD") and number:
+            add(command, name, number)
 
-        
-    
+        elif command.startswith("CHANGE"):
+            change(command, name, number)
 
-  
+        elif command.startswith("PHONE"):
+            print(f'Phone number: {phone(command, name, number)}')
+
+        elif command.startswith("SHOW") and name and name.upper().startswith("ALL"):
+            print(f'Phonebook:\n {show_all()}')
+
+        elif command.startswith("GOOD") and name and name.upper().startswith("BYE") or command.startswith("CLOSE") or command.startswith("EXIT"):
+            print(exit())
+            break   
+
+        else:
+            print("No commands in list. Try: add/change/phone/show all/good bye/close/exit")
+
+if __name__ == '__main__':
+    main()
